@@ -27,9 +27,9 @@ for f in glob.glob('./content/blog/**/index.md', recursive=True):
       convert_to_webp(png_path)
       os.remove(png)
       num_converted = num_converted + 1
-      print("Converted - {}".format(png))
+      print(f"Converted - {png}")
       # Replace occurrences in the article file
       find_and_replace_file(f, os.path.basename(png_path), os.path.basename(png_path.with_suffix(".webp")))
 
 
-print("Converted {} images".format(num_converted))
+print(f"Converted {num_converted} images")

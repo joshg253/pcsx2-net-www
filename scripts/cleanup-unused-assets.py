@@ -18,6 +18,6 @@ for f in glob.glob('./content/blog/**/index.md', recursive=True):
       if article_contents.find(os.path.basename(img)) == -1:
         os.remove(img)
         num_removed = num_removed + 1
-        print("Removed - {}".format(img))
+        print(f"Removed - {img}")
 
-print("Removed {} images".format(num_removed))
+print(f"Removed {num_removed} images")

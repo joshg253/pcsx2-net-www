@@ -22,7 +22,9 @@ with open('./deps-info.json', 'r') as f:
 should_exit = False
 for npm_dep, npm_ver in npm_info.items():
   if npm_ver != vendored_info[npm_dep]['pinnedVersion']:
-    print("MISMATCH FOUND: {}@{} != {}@{}".format(npm_dep, npm_ver, npm_dep, vendored_info[npm_dep]['pinnedVersion']))
+    print(
+        f"MISMATCH FOUND: {npm_dep}@{npm_ver} != {npm_dep}@{vendored_info[npm_dep]['pinnedVersion']}"
+    )
     should_exit = True
 
 if should_exit:
@@ -39,9 +41,9 @@ import shutil
 def construct_url(base_url, version, file_name):
   # Handle intricates between CDNs
   if 'unpkg' in base_url or 'jsdelivr' in base_url:
-    return "{}@{}/{}".format(base_url, version, file_name)
+    return f"{base_url}@{version}/{file_name}"
   if 'cdnjs.cloudflare' in base_url:
-    return "{}/{}/{}".format(base_url, version, file_name)
+    return f"{base_url}/{version}/{file_name}"
 
 for dep, meta in vendored_info.items():
   # TODO - error if 404
@@ -50,8 +52,8 @@ for dep, meta in vendored_info.items():
     # download the files into the new directory
     for f in meta['js']['filesToVendor']:
       r = requests.get(construct_url(meta['js']['baseUrlToFetch'], meta['pinnedVersion'], f))
-      save_path = "{}@{}/{}".format(meta['js']['directoryToSave'], meta['pinnedVersion'], os.path.basename(f))
-      for path in glob.glob("{}*".format(meta['js']['directoryToSave'])):
+      save_path = f"{meta['js']['directoryToSave']}@{meta['pinnedVersion']}/{os.path.basename(f)}"
+      for path in glob.glob(f"{meta['js']['directoryToSave']}*"):
         shutil.rmtree(path)
       os.makedirs(os.path.dirname(save_path))
       with open(save_path, 'wb') as f:
@@ -61,8 +63,8 @@ for dep, meta in vendored_info.items():
     # download the files into the new directory
     for f in meta['css']['filesToVendor']:
       r = requests.get(construct_url(meta['css']['baseUrlToFetch'], meta['pinnedVersion'], f))
-      save_path = "{}@{}/{}".format(meta['css']['directoryToSave'], meta['pinnedVersion'], os.path.basename(f))
-      for path in glob.glob("{}*".format(meta['css']['directoryToSave'])):
+      save_path = f"{meta['css']['directoryToSave']}@{meta['pinnedVersion']}/{os.path.basename(f)}"
+      for path in glob.glob(f"{meta['css']['directoryToSave']}*"):
         shutil.rmtree(path)
       os.makedirs(os.path.dirname(save_path))
       with open(save_path, 'wb') as f:
@@ -83,8 +85,8 @@ for path in Path('./themes/pcsx2').rglob('*.html'):
   for line in lines:
     line_to_append = line
     for dep, meta in vendored_info.items():
-      if ('script' in line or '<link' in line) and 'vendor/{}'.format(dep) in line:
-        line_to_append = re.sub('@(\d+\.?)+', "@{}".format(meta['pinnedVersion']), line)
+      if (('script' in line or '<link' in line)) and f'vendor/{dep}' in line:
+        line_to_append = re.sub('@(\d+\.?)+', f"@{meta['pinnedVersion']}", line)
         break
     modified_lines.append(line_to_append)
   # write the file
